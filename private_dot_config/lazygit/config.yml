@@ -1,0 +1,11 @@
+gui:
+  theme:
+    selectedLineBgColor:
+      - reverse
+    selectedRangeBgColor:
+      - reverse
+git:
+  paging:
+    colorArg: always
+    # pager: delta -s --dark --paging=never
+    externalDiffCommand: difft --color=always
