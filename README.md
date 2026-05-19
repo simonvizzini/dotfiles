@@ -15,7 +15,7 @@ for the age key).
 | `private_dot_config/kitty/` | Kitty terminal config |
 | `private_dot_config/lazygit/`, `bat/` | TUI tools |
 | `private_dot_config/gh/config.yml` | GitHub CLI config (hosts.yml ignored — token) |
-| `private_dot_ssh/config.tmpl` | SSH host aliases, work hosts gated by template var |
+| `private_dot_ssh/encrypted_config.age` | SSH host aliases, age-encrypted |
 | `encrypted_private_dot_config/rclone/rclone.conf.age` | Hetzner remote, age-encrypted |
 | `run_once_before_install-system-packages.sh.tmpl` | `pacman -S` deps on Arch |
 | `run_once_before_install-prezto.sh.tmpl` | Clones prezto + symlinks runcoms |
@@ -71,7 +71,6 @@ encryption = "age"
     recipient = "age1...the-public-key-from-the-master-machine..."
 
 [data]
-    work_machine = false              # true on machines that need work SSH hosts
     keepass_dir = "/home/simon/keepass"
     rclone_remote = "Hetzner:keepass"
 ```
@@ -164,8 +163,8 @@ To template a file based on machine-specific data, rename to `*.tmpl` and
 reference `~/.config/chezmoi/chezmoi.toml` `[data]` keys:
 
 ```
-{{ if .work_machine -}}
-...work-only content...
+{{ if eq .chezmoi.hostname "laptop" -}}
+...laptop-only content...
 {{- end }}
 ```
 
@@ -181,7 +180,6 @@ encryption = "age"
     recipient = "age1..."
 
 [data]
-    work_machine = true | false
     keepass_dir = "/home/simon/keepass"
     rclone_remote = "Hetzner:keepass"
 ```
