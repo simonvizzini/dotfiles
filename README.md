@@ -43,25 +43,50 @@ sh -c "$(curl -fsLS get.chezmoi.io)"   # chezmoi
 sudo apt install age git
 ```
 
-### 2. Restore the age private key
+### 2. Transfer the age private key
 
 The age **private key** lives at `~/.config/chezmoi/key.txt` and is **not**
-in this repo. On the master machine the key was generated with:
+in this repo. On the master machine it was generated with:
 
 ```bash
 mkdir -p ~/.config/chezmoi
 age-keygen -o ~/.config/chezmoi/key.txt
-# The PUBLIC key is printed; it's also in chezmoi.toml.tmpl (committed).
+# The PUBLIC key is printed; it's also baked into chezmoi.toml.tmpl (committed).
 ```
 
-I keep the private key as a KeePassXC attachment on a "chezmoi age key"
-entry. On a fresh machine: unlock the KeePassXC database, export the
-attachment to `~/.config/chezmoi/key.txt`, then `chmod 600` it.
+To get the key onto a fresh machine, the standard flow is
+**[magic-wormhole](https://magic-wormhole.readthedocs.io/)** — a one-shot
+E2E-encrypted transfer with a single-use code phrase.
+
+On the **source** machine (this one):
+
+```bash
+wormhole send ~/.config/chezmoi/key.txt
+# Prints something like:  Wormhole code is: 7-crossover-clockwork
+```
+
+On the **destination** machine:
+
+```bash
+sudo pacman -S magic-wormhole          # or your distro's equivalent
+mkdir -p ~/.config/chezmoi
+cd ~/.config/chezmoi && wormhole receive
+# Type the code phrase shown on the source machine.
+chmod 600 ~/.config/chezmoi/key.txt
+```
+
+The wormhole code is single-use and the channel is end-to-end encrypted via
+PAKE — the relay server can't see the file. Codes expire on first use or
+after a few minutes if not claimed.
+
+Backup: also keep `key.txt` as an attachment on a "chezmoi age key" entry
+in your KeePassXC database. That way you can always recover it as long as
+the KDBX is reachable.
 
 ### 3. Create the per-machine chezmoi config
 
 Copy `chezmoi.toml.tmpl` from this repo to `~/.config/chezmoi/chezmoi.toml`,
-edit the placeholders:
+edit:
 
 ```toml
 encryption = "age"
@@ -71,9 +96,24 @@ encryption = "age"
     recipient = "age1...the-public-key-from-the-master-machine..."
 
 [data]
+    # true on machines that should run the KeePassXC <-> rclone sync.
+    # false on VMs / throwaway boxes that just need the shell + editor env.
+    keepass_sync = false
+
+    # Only consulted when keepass_sync = true.
     keepass_dir = "/home/simon/keepass"
     rclone_remote = "Hetzner:keepass"
 ```
+
+When `keepass_sync = false`:
+
+- `cronie`, `rclone`, and `keepassxc` are NOT installed by the bootstrap script
+- The cronie-enable and crontab-install scripts no-op
+- The encrypted `rclone.conf` is not decrypted into `~/.config/rclone/`
+- You still get: zsh + prezto, p10k, nvim, kitty, git, lazygit, bat, gh,
+  ansible, git-delta, magic-wormhole
+
+When `keepass_sync = true` everything above plus the full sync wiring.
 
 ### 4. Apply
 
@@ -82,11 +122,11 @@ chezmoi init --apply git@github.com:simonvizzini/dotfiles.git
 ```
 
 This runs in order:
-1. `run_once_before_install-system-packages.sh` — installs pacman deps
+1. `run_once_before_install-system-packages.sh` — installs pacman deps (skips cronie/rclone/keepassxc when `keepass_sync = false`)
 2. `run_once_before_install-prezto.sh` — clones prezto, symlinks unmodified runcoms
-3. All managed files written to `~` (decrypts `rclone.conf.age` along the way)
-4. `run_once_after_enable-cronie.sh` — enables the cron daemon
-5. `run_onchange_after_install-crontab.sh` — installs the user crontab
+3. All managed files written to `~` (decrypts `rclone.conf.age` only when `keepass_sync = true`)
+4. `run_once_after_enable-cronie.sh` — enables the cron daemon (no-op when `keepass_sync = false`)
+5. `run_onchange_after_install-crontab.sh` — installs the user crontab (no-op when `keepass_sync = false`)
 
 If anything fails partway, the script tells you what — fix and re-run.
 
@@ -180,6 +220,7 @@ encryption = "age"
     recipient = "age1..."
 
 [data]
+    keepass_sync = true | false       # gate the rclone keepass sync wiring
     keepass_dir = "/home/simon/keepass"
     rclone_remote = "Hetzner:keepass"
 ```

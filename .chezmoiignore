@@ -3,3 +3,6 @@ private_dot_config/kitty/kitty.conf.bak
 private_dot_config/gh/hosts.yml
 README.md
 chezmoi.toml.tmpl
+{{ if not .keepass_sync -}}
+private_dot_config/rclone/encrypted_private_rclone.conf.age
+{{- end }}

@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # Install the user crontab. Re-runs whenever the rendered content of this
-# script changes (chezmoi hashes the rendered file). Templated values for
-# keepass_dir and rclone_remote come from ~/.config/chezmoi/chezmoi.toml.
+# script changes. No-ops on machines where keepass_sync is false.
 
 set -euo pipefail
+
+{{ if not .keepass_sync -}}
+echo "keepass_sync = false on this machine — skipping crontab install."
+exit 0
+{{- end }}
 
 if ! command -v crontab >/dev/null 2>&1; then
     echo "crontab command not found — install cronie (or equivalent) first." >&2

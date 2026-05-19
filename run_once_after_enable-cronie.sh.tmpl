@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Enable the cronie system service so the user crontab actually runs.
-# Requires sudo. Safe to skip if cronie isn't installed or we're not on systemd.
+# Requires sudo. No-ops on machines where keepass_sync is false.
 
 set -euo pipefail
+
+{{ if not .keepass_sync -}}
+echo "keepass_sync = false on this machine — skipping cronie enable."
+exit 0
+{{- end }}
 
 if ! command -v systemctl >/dev/null 2>&1; then
     echo "systemctl not available — skipping cronie enable." >&2

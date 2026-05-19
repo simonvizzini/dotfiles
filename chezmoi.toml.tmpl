@@ -11,7 +11,14 @@ encryption = "age"
     recipient = "age1nljqacs5k9sht2u78etusp96n79mmxyl2anemq4vkjctknlvap2qxthph4"
 
 [data]
-    # Used by the crontab installer. Override per machine if your keepass dir
-    # or rclone remote name differs.
+    # Set true on machines that should run the KeePassXC <-> rclone sync.
+    # When true: cronie + rclone + keepassxc are installed, cronie.service is
+    # enabled, the user crontab is written, and the encrypted rclone.conf is
+    # decrypted into ~/.config/rclone/. Set false on VMs / throwaway machines
+    # where you just want the shell + editor environment.
+    keepass_sync = false
+
+    # Only used when keepass_sync = true. Override per machine if your keepass
+    # dir or rclone remote name differs.
     keepass_dir = "/home/simon/keepass"
     rclone_remote = "Hetzner:keepass"

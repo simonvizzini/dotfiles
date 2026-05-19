@@ -8,19 +8,22 @@
 set -euo pipefail
 
 PACKAGES=(
-    cronie          # cron daemon for the rclone keepass sync
-    rclone          # cloud storage sync (used by the cron entry)
     age             # secrets decryption for chezmoi
     kitty           # terminal emulator
     neovim          # editor (AstroNvim-based config)
     zsh             # shell
     git             # required for chezmoi + prezto clone
-    keepassxc       # password manager + SSH agent integration
     lazygit         # git TUI
     bat             # cat replacement, syntax highlighted
     github-cli      # the `gh` command
     ansible         # automation
     git-delta       # better git diff (referenced by ~/.gitconfig)
+    magic-wormhole  # ad-hoc encrypted file transfer (used for bootstrapping the age key on new machines)
+{{ if .keepass_sync }}
+    cronie          # cron daemon for the rclone keepass sync
+    rclone          # cloud storage sync (used by the cron entry)
+    keepassxc       # password manager + SSH agent integration
+{{- end }}
 )
 
 DISTRO_ID="unknown"
