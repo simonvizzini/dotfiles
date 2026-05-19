@@ -1,0 +1,25 @@
+[user]
+	name = Simon Vizzini
+	email = simon@vizzini.me
+[core]
+	askpass = /usr/bin/ksshaskpass
+[merge]
+	conflictstyle = diff3
+[pull]
+	rebase = true
+[pager]
+  diff = delta
+  log = delta
+  reflog = delta
+  show = delta
+  blame = delta
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  features = side-by-side line-numbers decorations
+  whitespace-error-style = 22 reverse
+  syntax-theme = Coldark-Dark
+; [delta "decorations"]
+  ; commit-decoration-style = bold yellow box ul
+  ; file-style = bold yellow ul
+  ; file-decoration-style = none
