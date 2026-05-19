@@ -19,6 +19,9 @@ PACKAGES=(
     ansible         # automation
     git-delta       # better git diff (referenced by ~/.gitconfig)
     magic-wormhole  # ad-hoc encrypted file transfer (used for bootstrapping the age key on new machines)
+    atuin           # magical shell history
+    broot           # fuzzy search + tree + cd
+    fnm             # node.js version manager built with Rust
 {{ if .keepass_sync }}
     cronie          # cron daemon for the rclone keepass sync
     rclone          # cloud storage sync (used by the cron entry)
