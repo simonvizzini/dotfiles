@@ -5,7 +5,7 @@ gui:
     selectedRangeBgColor:
       - reverse
 git:
-  paging:
-    colorArg: always
-    # pager: delta -s --dark --paging=never
-    externalDiffCommand: difft --color=always
+  pagers:
+    - colorArg: always
+      # pager: delta -s --dark --paging=never
+      externalDiffCommand: difft --color=always
