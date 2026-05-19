@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Bootstrap zprezto on a fresh machine.
+#
+# Clones prezto upstream and creates symlinks for the runcoms that we do NOT
+# manage via chezmoi (zshenv, zlogin, zlogout). The customized runcoms
+# (zshrc, zpreztorc, zprofile) are written as real files by chezmoi and will
+# overwrite any existing symlinks at the same paths.
+
+set -euo pipefail
+
+PREZTO_REPO="https://github.com/sorin-ionescu/prezto.git"
+PREZTO_DIR="${HOME}/.zprezto"
+
+if [ ! -d "${PREZTO_DIR}" ]; then
+    echo "Cloning prezto into ${PREZTO_DIR}..."
+    git clone --recursive "${PREZTO_REPO}" "${PREZTO_DIR}"
+else
+    echo "prezto already at ${PREZTO_DIR} — skipping clone"
+fi
+
+# Symlink only the unmodified runcoms. zshrc/zpreztorc/zprofile are managed
+# by chezmoi as real files, so we don't touch them here.
+for rc in zshenv zlogin zlogout; do
+    target="${PREZTO_DIR}/runcoms/${rc}"
+    link="${HOME}/.${rc}"
+    if [ ! -e "${link}" ] && [ ! -L "${link}" ]; then
+        ln -s "${target}" "${link}"
+        echo "linked ~/.${rc} -> ${target}"
+    fi
+done
