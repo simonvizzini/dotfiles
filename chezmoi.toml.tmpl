@@ -6,9 +6,9 @@ encryption = "age"
 
 [age]
     identity = "~/.config/chezmoi/key.txt"
-    # Replace with the age public key printed by `age-keygen -o ~/.config/chezmoi/key.txt`.
-    # The public key is safe to commit; the private key (key.txt) MUST NOT be in the repo.
-    recipient = "age1REPLACE_WITH_YOUR_PUBLIC_KEY"
+    # Public key is safe to commit; private key (key.txt) MUST NOT be in the repo.
+    # Restore key.txt to ~/.config/chezmoi/key.txt from KeePassXC before running `chezmoi init --apply`.
+    recipient = "age1nljqacs5k9sht2u78etusp96n79mmxyl2anemq4vkjctknlvap2qxthph4"
 
 [data]
     # Set true on machines that should get the work-host SSH config blocks
