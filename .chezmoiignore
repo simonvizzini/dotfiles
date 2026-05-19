@@ -1,3 +1,5 @@
 private_dot_config/nvim/lazy-lock.json
 private_dot_config/kitty/kitty.conf.bak
 private_dot_config/gh/hosts.yml
+README.md
+chezmoi.toml.tmpl

@@ -1,0 +1,21 @@
+# Reference template for ~/.config/chezmoi/chezmoi.toml on a new machine.
+# Copy this to ~/.config/chezmoi/chezmoi.toml BEFORE running `chezmoi init --apply`.
+# This file is NOT applied to the destination — see .chezmoiignore.
+
+encryption = "age"
+
+[age]
+    identity = "~/.config/chezmoi/key.txt"
+    # Replace with the age public key printed by `age-keygen -o ~/.config/chezmoi/key.txt`.
+    # The public key is safe to commit; the private key (key.txt) MUST NOT be in the repo.
+    recipient = "age1REPLACE_WITH_YOUR_PUBLIC_KEY"
+
+[data]
+    # Set true on machines that should get the work-host SSH config blocks
+    # (Daimler / Mercedes-Benz / SWARCO / delta-ev). Set false on personal-only machines.
+    work_machine = false
+
+    # Used by the crontab installer. Override per machine if your keepass dir
+    # or rclone remote name differs.
+    keepass_dir = "/home/simon/keepass"
+    rclone_remote = "Hetzner:keepass"
