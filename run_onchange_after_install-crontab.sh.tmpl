@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Install the user crontab. Re-runs whenever the rendered content of this
+# script changes (chezmoi hashes the rendered file). Templated values for
+# keepass_dir and rclone_remote come from ~/.config/chezmoi/chezmoi.toml.
+
+set -euo pipefail
+
+if ! command -v crontab >/dev/null 2>&1; then
+    echo "crontab command not found — install cronie (or equivalent) first." >&2
+    exit 0
+fi
+
+KEEPASS_DIR="{{ .keepass_dir }}"
+RCLONE_REMOTE="{{ .rclone_remote }}"
+
+crontab - <<EOF
+#No comment
+*/5 * * * *	/usr/bin/rclone bisync ${KEEPASS_DIR} ${RCLONE_REMOTE} --verbose --force
+EOF
+
+echo "user crontab installed:"
+crontab -l

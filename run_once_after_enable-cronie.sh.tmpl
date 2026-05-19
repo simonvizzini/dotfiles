@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Enable the cronie system service so the user crontab actually runs.
+# Requires sudo. Safe to skip if cronie isn't installed or we're not on systemd.
+
+set -euo pipefail
+
+if ! command -v systemctl >/dev/null 2>&1; then
+    echo "systemctl not available — skipping cronie enable." >&2
+    exit 0
+fi
+
+if ! systemctl list-unit-files cronie.service >/dev/null 2>&1; then
+    echo "cronie.service not present — install cronie package first." >&2
+    exit 0
+fi
+
+if systemctl is-active --quiet cronie.service && systemctl is-enabled --quiet cronie.service; then
+    echo "cronie.service already active and enabled."
+    exit 0
+fi
+
+echo "Enabling and starting cronie.service (requires sudo)..."
+sudo systemctl enable --now cronie.service
