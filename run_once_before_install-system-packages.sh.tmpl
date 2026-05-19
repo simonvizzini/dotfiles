@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Install system packages required by the rest of the chezmoi configuration.
+# Runs once per content-hash of this script. Safe to re-run (uses --needed).
+#
+# Detects the distro via /etc/os-release. Arch family gets a pacman install;
+# other distros print the list and exit (you install manually).
+
+set -euo pipefail
+
+PACKAGES=(
+    cronie          # cron daemon for the rclone keepass sync
+    rclone          # cloud storage sync (used by the cron entry)
+    age             # secrets decryption for chezmoi
+    kitty           # terminal emulator
+    neovim          # editor (AstroNvim-based config)
+    zsh             # shell
+    git             # required for chezmoi + prezto clone
+    keepassxc       # password manager + SSH agent integration
+    lazygit         # git TUI
+    bat             # cat replacement, syntax highlighted
+    github-cli      # the `gh` command
+    ansible         # automation
+    delta           # better git diff (referenced by ~/.gitconfig)
+)
+
+DISTRO_ID="unknown"
+if [ -r /etc/os-release ]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    DISTRO_ID="${ID:-unknown}"
+    DISTRO_LIKE="${ID_LIKE:-}"
+fi
+
+is_arch_family() {
+    case "${DISTRO_ID}" in arch|manjaro|endeavouros|cachyos) return 0 ;; esac
+    case "${DISTRO_LIKE:-}" in *arch*) return 0 ;; esac
+    return 1
+}
+
+if is_arch_family; then
+    echo "Detected Arch-family distro (${DISTRO_ID}). Installing packages..."
+    sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"
+else
+    echo "Distro '${DISTRO_ID}' is not Arch-family — install these packages manually:" >&2
+    printf '  - %s\n' "${PACKAGES[@]}" >&2
+    echo "Then re-run \`chezmoi apply\`." >&2
+fi
